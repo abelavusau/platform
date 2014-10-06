@@ -1,0 +1,35 @@
+@CHARSET "UTF-8";
+
+.gridster {
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	width: 80%;
+	float: right;
+	min-height: 300px;
+    box-sizing: border-box;
+}
+
+.gridster ul li {
+	background-color: aqua;
+}
+
+.pallete {
+	width: 20%;
+	float: left;
+}
+
+.pallete ul li {
+    background-color: lime;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
+    cursor: move;
+}
+
+.body {
+    padding: 10px 10px 0px 10px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 600px;
+}
