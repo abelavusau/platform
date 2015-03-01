@@ -51,6 +51,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	return configurer;
     }
 
+    @Bean(name = "userDAO")
+    @Autowired
+    public GenericDAO<User> getUserDao(SessionFactory sessionFactory) {
+        return new GenericDAOImpl<User>(sessionFactory, User.class);
+    }
+    
     @Bean(name = "userService")
     @Resource(name = "userDAO")
     public GenericService<User> getUserService(GenericDAO<User> dao) {

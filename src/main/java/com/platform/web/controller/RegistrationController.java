@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +28,9 @@ public class RegistrationController {
 
     @Resource(name = "roleService")
     private GenericService<Role> roleService;
+    
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     @RequestMapping(method = RequestMethod.GET)
     public String index(Model model) {
@@ -37,6 +41,7 @@ public class RegistrationController {
     @RequestMapping(method = RequestMethod.POST)
     public String registerUser(@ModelAttribute(value = "user") User user, BindingResult bindingResult) {
 	List<Role> roles = roleService.loadAll();
+	user.setPassword(passwordEncoder.encode(user.getPassword()));
 	user.getRoles().add(roles.get(1)); // set role to ROLE_USER
 	user.setEnabled(true);
 	userService.create(user);
