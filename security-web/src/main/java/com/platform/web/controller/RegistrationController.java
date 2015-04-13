@@ -22,30 +22,32 @@ import com.platform.web.service.generic.GenericService;
 @RequestMapping(value = "/registration")
 public class RegistrationController {
 
-    @Resource(name = "userService")
-    private GenericService<User> userService;
+	@Resource(name = "userService")
+	private GenericService<User> userService;
 
-    @Resource(name = "roleService")
-    private GenericService<Role> roleService;
+	@Resource(name = "roleService")
+	private GenericService<Role> roleService;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public String index(Model model) {
-	model.addAttribute(new User());
-	return "login/registration";
-    }
+	@RequestMapping(method = RequestMethod.GET)
+	public String index(Model model) {
+		model.addAttribute(new User());
+		return "login/registration";
+	}
 
-    @RequestMapping(method = RequestMethod.POST)
-    public String registerUser(@ModelAttribute(value = "user") User user, BindingResult bindingResult) {
-	List<Role> roles = roleService.loadAll();
-	user.getRoles().add(roles.get(1)); // set role to ROLE_USER
-	user.setEnabled(true);
-	userService.create(user);
-	return "redirect:/registration/success";
-    }
+	@RequestMapping(method = RequestMethod.POST)
+	public String registerUser(@ModelAttribute(value = "user") User user,
+			BindingResult bindingResult) {
+		List<Role> roles = roleService.loadAll();
+		user.getRoles().add(roles.get(1)); // set role to ROLE_USER
+		user.setEnabled(true);
+		userService.create(user);
+		return "redirect:/registration/success";
+	}
 
-    @RequestMapping(value = "/success", method = RequestMethod.GET)
-    public String registerSuccess(@ModelAttribute(value = "user") User user, SessionStatus status) {
-	status.setComplete();
-	return "login/success";
-    }
+	@RequestMapping(value = "/success", method = RequestMethod.GET)
+	public String registerSuccess(@ModelAttribute(value = "user") User user,
+			SessionStatus status) {
+		status.setComplete();
+		return "login/success";
+	}
 }
