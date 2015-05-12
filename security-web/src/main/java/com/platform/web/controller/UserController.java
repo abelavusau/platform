@@ -13,12 +13,12 @@ import com.platform.web.service.generic.GenericService;
 @Controller
 @RequestMapping(value = "/user")
 public class UserController {
-	@Resource(name = "userService")
-	private GenericService<User> service;
+    @Resource(name = "userService")
+    private GenericService<User> service;
 
-	@RequestMapping(value = "/all", method = RequestMethod.GET)
-	public String printHello(ModelMap model) {
-		model.addAttribute("users", service.loadAll());
-		return "user";
-	}
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public String printHello(ModelMap model) {
+	model.addAttribute("users", service.loadAll());
+	return "user";
+    }
 }

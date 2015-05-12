@@ -13,8 +13,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jms.annotation.EnableJms;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.support.destination.DestinationResolver;
+import org.springframework.jms.support.destination.DynamicDestinationResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -34,72 +37,103 @@ import com.platform.web.service.impl.generic.GenericServiceImpl;
 @EnableWebMvc
 @EnableJms
 @ComponentScan(basePackages = { "com.platform.web.controller",
-		"com.platform.web.dao" })
+        "com.platform.web.dao", "com.platform.web.jms" })
 public class WebConfig extends WebMvcConfigurerAdapter {
 
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/css/**").addResourceLocations(
-				"/WEB-INF/css/");
-		registry.addResourceHandler("/js/**").addResourceLocations(
-				"/WEB-INF/js/");
-	}
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	registry.addResourceHandler("/css/**").addResourceLocations(
+	        "/WEB-INF/css/");
+	registry.addResourceHandler("/js/**").addResourceLocations(
+	        "/WEB-INF/js/");
+    }
 
-	@Bean
-	public InternalResourceViewResolver viewResolver() {
-		InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-		viewResolver.setViewClass(JstlView.class);
-		viewResolver.setPrefix("/WEB-INF/jsp/");
-		viewResolver.setSuffix(".jsp");
-		return viewResolver;
-	}
+    @Bean
+    public InternalResourceViewResolver viewResolver() {
+	InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+	viewResolver.setViewClass(JstlView.class);
+	viewResolver.setPrefix("/WEB-INF/jsp/");
+	viewResolver.setSuffix(".jsp");
+	return viewResolver;
+    }
 
-	@Bean
-	public TilesConfigurer getTilesConfigurer() {
-		TilesConfigurer configurer = new TilesConfigurer();
-		configurer.setDefinitions("/WEB-INF/tiles/tiles-definitions.xml");
-		return configurer;
-	}
+    @Bean
+    public TilesConfigurer getTilesConfigurer() {
+	TilesConfigurer configurer = new TilesConfigurer();
+	configurer.setDefinitions("/WEB-INF/tiles/tiles-definitions.xml");
+	return configurer;
+    }
 
-	//http://shengwangi.blogspot.com/2014/10/spring-jms-with-activemq-helloworld-example-send.html
-	@Bean
-	public ConnectionFactory getAMQConnectionFactory() {
-		return new ActiveMQConnectionFactory("tcp://192.168.203.143:61616");
-	}
- 
-	@Bean
-	public ConnectionFactory getConnectionFactory() {
-		return new CachingConnectionFactory(getAMQConnectionFactory());
-	}
- 
-	@Bean
-	public Queue getDestination() {
-		return new ActiveMQQueue("Send2Recv");
-	}
- 
-	@Bean
-	public JmsTemplate getJmsTemplate() {
-		JmsTemplate jmsTemplate = new JmsTemplate();
-		jmsTemplate.setConnectionFactory(getConnectionFactory());
-		jmsTemplate.setDefaultDestination(getDestination());
-		return jmsTemplate;
-	}
+    // http://shengwangi.blogspot.com/2014/10/spring-jms-with-activemq-helloworld-example-send.html
 
-	@Bean(name = "userService")
-	@Resource(name = "userDAO")
-	public GenericService<User> getUserService(GenericDAO<User> dao) {
-		return new GenericServiceImpl<User>(dao);
-	}
+    // @Bean
+    // public MessageListener getReciever() {
+    // return new Reciever();
+    // }
 
-	@Bean(name = "roleDAO")
-	@Autowired
-	public GenericDAO<Role> getRoleDAO(SessionFactory sessionFactory) {
-		return new GenericDAOImpl<Role>(sessionFactory, Role.class);
-	}
+    // @Bean
+    // public DefaultMessageListenerContainer
+    // getDefaultMessageListenerContainer() {
+    // DefaultMessageListenerContainer defaultMessageListenerContainer = new
+    // DefaultMessageListenerContainer();
+    // defaultMessageListenerContainer.setConnectionFactory(getConnectionFactory());
+    // defaultMessageListenerContainer.setDestination(getDestination());
+    // defaultMessageListenerContainer.setMessageListener(getReciever());
+    // return defaultMessageListenerContainer;
+    // }
 
-	@Bean(name = "roleService")
-	@Resource(name = "roleDAO")
-	public GenericService<Role> getRoleService(GenericDAO<Role> dao) {
-		return new GenericServiceImpl<Role>(dao);
-	}
+    @Bean
+    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
+	DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+	factory.setConnectionFactory(getConnectionFactory());
+	factory.setDestinationResolver(getDestinationResolver());
+	factory.setConcurrency("3-10");
+	return factory;
+    }
+    
+    @Bean
+    public DestinationResolver getDestinationResolver() {
+	return new DynamicDestinationResolver();
+    }
+
+    @Bean
+    public ConnectionFactory getAMQConnectionFactory() {
+	return new ActiveMQConnectionFactory("tcp://127.0.0.1:61616");
+    }
+
+    @Bean
+    public ConnectionFactory getConnectionFactory() {
+	return new CachingConnectionFactory(getAMQConnectionFactory());
+    }
+
+    @Bean
+    public Queue getDestination() {
+	return new ActiveMQQueue("myMessageQueue");
+    }
+
+    @Bean
+    public JmsTemplate getJmsTemplate() {
+	JmsTemplate jmsTemplate = new JmsTemplate();
+	jmsTemplate.setConnectionFactory(getConnectionFactory());
+	jmsTemplate.setDefaultDestination(getDestination());
+	return jmsTemplate;
+    }
+
+    @Bean(name = "userService")
+    @Resource(name = "userDAO")
+    public GenericService<User> getUserService(GenericDAO<User> dao) {
+	return new GenericServiceImpl<User>(dao);
+    }
+
+    @Bean(name = "roleDAO")
+    @Autowired
+    public GenericDAO<Role> getRoleDAO(SessionFactory sessionFactory) {
+	return new GenericDAOImpl<Role>(sessionFactory, Role.class);
+    }
+
+    @Bean(name = "roleService")
+    @Resource(name = "roleDAO")
+    public GenericService<Role> getRoleService(GenericDAO<Role> dao) {
+	return new GenericServiceImpl<Role>(dao);
+    }
 }

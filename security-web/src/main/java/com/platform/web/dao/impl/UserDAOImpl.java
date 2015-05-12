@@ -12,22 +12,22 @@ import com.platform.web.model.User;
 @Repository(value = "userDAO")
 public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO {
 
-	@Autowired
-	private PasswordEncoder encoder;
+    @Autowired
+    private PasswordEncoder encoder;
 
-	@Autowired
-	public UserDAOImpl(SessionFactory sessionFactory) {
-		super(sessionFactory, User.class);
-	}
+    @Autowired
+    public UserDAOImpl(SessionFactory sessionFactory) {
+	super(sessionFactory, User.class);
+    }
 
-	@Override
-	public Long create(User entity) {
-		entity.setPassword(encoder.encode(entity.getPassword()));
-		return super.create(entity);
-	}
+    @Override
+    public Long create(User entity) {
+	entity.setPassword(encoder.encode(entity.getPassword()));
+	return super.create(entity);
+    }
 
-	@Override
-	public void update(User entity) {
-		super.update(entity);
-	}
+    @Override
+    public void update(User entity) {
+	super.update(entity);
+    }
 }

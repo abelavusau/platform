@@ -10,9 +10,9 @@ import com.platform.web.model.User;
 @Controller
 @RequestMapping(value = "/examples")
 public class ExamplesController {
-	@RequestMapping(value = "gridster", method = RequestMethod.GET)
-	public String gridster(Model model) {
-		model.addAttribute(new User());
-		return "examples/gridster";
-	}
+    @RequestMapping(value = "gridster", method = RequestMethod.GET)
+    public String gridster(Model model) {
+	model.addAttribute(new User());
+	return "examples/gridster";
+    }
 }
