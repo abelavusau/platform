@@ -8,14 +8,14 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Reciever {
-    @JmsListener(destination = "myMessageQueue")
+public class Consumer {
+    @JmsListener(destination = "myMessageTopic")
     public void onMessage(Message message) {
 	if (message instanceof ObjectMessage) {
 	    ObjectMessage msg = (ObjectMessage) message;
-
+	    
 	    try {
-		System.out.println("The message received from queue: " + msg.getObject().toString());
+		System.out.println("The message received from topic: " + msg.getObject().toString());
 	    } catch (JMSException e) {
 		e.printStackTrace();
 	    }
